@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "id": "brf-101",
+    "buyerName": "Alexander Wright",
+    "buyerUsername": "alex_wright_dev",
+    "country": "United States",
+    "flag": "🇺🇸",
+    "title": "Need full-stack CRM with Neon PostgreSQL live database",
+    "description": "Looking for an agency to build a high-performance CRM with live database synchronization and multi-profile seller attribution.",
+    "budget": 2500,
+    "currency": "USD",
+    "targetProfile": "Kodevio Studio",
+    "matchScore": 98,
+    "status": "DISPATCHED",
+    "category": "Web Development",
+    "dispatchedAt": "2026-09-13T07:13:40.724Z",
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "brf-102",
+    "buyerName": "Elena Rostova",
+    "buyerUsername": "elena_fintech",
+    "country": "Germany",
+    "flag": "🇩🇪",
+    "title": "Flutter Fintech wallet app with real-time biometric authorization",
+    "description": "Cross-platform iOS and Android mobile app with secure payments API.",
+    "budget": 3500,
+    "currency": "USD",
+    "targetProfile": "TechVerse Solutions",
+    "matchScore": 94,
+    "status": "PENDING_DISPATCH",
+    "category": "App Development",
+    "dispatchedAt": null,
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  }
+]

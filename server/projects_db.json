@@ -1,1 +1,99 @@
-[]
+[
+  {
+    "id": "PRJ-101",
+    "projectCode": "PRJ-101",
+    "title": "Enterprise SaaS Analytics Dashboard & CRM Hub",
+    "category": "Web Development",
+    "service": "Full Stack",
+    "clientName": "Sarah Jenkins",
+    "clientUsername": "sarah_growth",
+    "fiverrProfile": "Kodevio Studio",
+    "milestone": "Milestone 2",
+    "status": "IN PROGRESS",
+    "priority": "HIGH",
+    "startDate": "2026-08-15",
+    "deadlineDate": "2026-09-30",
+    "earnedAmount": 4500,
+    "totalAmount": 9500,
+    "salesHandler": {
+      "code": "K001",
+      "name": "Super Admin"
+    },
+    "opsHandler": {
+      "code": "10034",
+      "name": "MD AZHAR UDDIN"
+    },
+    "devAssignees": [
+      "KHALID HASAN",
+      "RUMI AKTAR"
+    ],
+    "postDeliveryIssue": "",
+    "notes": "Live PostgreSQL sync integration active with dual-persistence.",
+    "created_at": "2026-09-13T07:13:40.724Z",
+    "updated_at": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "PRJ-102",
+    "projectCode": "PRJ-102",
+    "title": "Mobile Delivery & Driver Dispatch App",
+    "category": "App Development",
+    "service": "Flutter / Mobile",
+    "clientName": "Marcus Vance",
+    "clientUsername": "marcus_enterprise",
+    "fiverrProfile": "TechVerse Solutions",
+    "milestone": "Milestone 1",
+    "status": "IN REVIEW",
+    "priority": "CRITICAL",
+    "startDate": "2026-08-20",
+    "deadlineDate": "2026-09-25",
+    "earnedAmount": 3200,
+    "totalAmount": 6400,
+    "salesHandler": {
+      "code": "K001",
+      "name": "Super Admin"
+    },
+    "opsHandler": {
+      "code": "10022",
+      "name": "MUNTASIR ASHIF"
+    },
+    "devAssignees": [
+      "SAMIUL HASAN"
+    ],
+    "postDeliveryIssue": "",
+    "notes": "Push notifications and offline sync implemented.",
+    "created_at": "2026-09-13T07:13:40.724Z",
+    "updated_at": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "PRJ-103",
+    "projectCode": "PRJ-103",
+    "title": "Autonomous AI Lead Inflow Engine",
+    "category": "AI & Automation",
+    "service": "AI / Python",
+    "clientName": "David Lindqvist",
+    "clientUsername": "nordic_david",
+    "fiverrProfile": "NextGen AI Labs",
+    "milestone": "Milestone 1",
+    "status": "COMPLETED",
+    "priority": "MEDIUM",
+    "startDate": "2026-08-01",
+    "deadlineDate": "2026-08-28",
+    "earnedAmount": 3500,
+    "totalAmount": 3500,
+    "salesHandler": {
+      "code": "10017",
+      "name": "MD AL SOHAN"
+    },
+    "opsHandler": {
+      "code": "10034",
+      "name": "MD AZHAR UDDIN"
+    },
+    "devAssignees": [
+      "FIROZ ALAM"
+    ],
+    "postDeliveryIssue": "",
+    "notes": "Completed and delivered ahead of schedule.",
+    "created_at": "2026-09-13T07:13:40.724Z",
+    "updated_at": "2026-09-13T07:13:40.724Z"
+  }
+]

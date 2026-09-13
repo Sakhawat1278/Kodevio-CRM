@@ -97,18 +97,47 @@ router.post('/', async (req, res) => {
       try {
         await pool.query(
           `INSERT INTO clients (
-            sales_person_code, sales_person_name, platform_source, source_profile,
+            id, sales_person_code, sales_person_name, platform_source, source_profile,
             name, username, email, phone, country, company_name, category, reply_method, status,
-            meeting_time, quotation_link, inbox_link, note, avatar_url, attachment_url
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+            meeting_time, quotation_link, inbox_link, note, avatar_url, attachment_url, total_orders, total_spent, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            username = EXCLUDED.username,
+            email = EXCLUDED.email,
+            phone = EXCLUDED.phone,
+            status = EXCLUDED.status,
+            country = EXCLUDED.country,
+            company_name = EXCLUDED.company_name`,
           [
-            newClient.sales_person_code, newClient.sales_person_name, newClient.platform_source, newClient.source_profile,
-            newClient.name, newClient.username, newClient.email, newClient.phone, newClient.country, newClient.company_name,
-            newClient.category, newClient.reply_method, newClient.status, newClient.meeting_time, newClient.quotation_link,
-            newClient.inbox_link, newClient.note, newClient.avatar_url, newClient.attachment_url,
+            newClient.id,
+            newClient.sales_person_code,
+            newClient.sales_person_name,
+            newClient.platform_source,
+            newClient.source_profile,
+            newClient.name,
+            newClient.username,
+            newClient.email,
+            newClient.phone,
+            newClient.country,
+            newClient.company_name,
+            newClient.category,
+            newClient.reply_method,
+            newClient.status,
+            newClient.meeting_time,
+            newClient.quotation_link,
+            newClient.inbox_link,
+            newClient.note,
+            newClient.avatar_url,
+            newClient.attachment_url,
+            newClient.total_orders,
+            newClient.total_spent,
+            newClient.created_at,
           ]
         );
-      } catch (e) {}
+      } catch (e) {
+        console.warn('PG insert client error:', e.message);
+      }
     }
 
     return res.status(201).json({

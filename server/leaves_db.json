@@ -7,5 +7,32 @@
     "maternity": 90,
     "paternity": 10
   },
-  "leaves": []
+  "leaves": [
+    {
+      "id": "LV-1001",
+      "userId": "10017",
+      "userCode": "10017",
+      "userName": "MD AL SOHAN",
+      "userEmail": "sohan@kodevio.com",
+      "userAvatar": "",
+      "department": "SALES",
+      "role": "Sales Manager",
+      "leaveType": "CASUAL",
+      "leaveCategory": "Personal Affairs",
+      "isHalfDay": false,
+      "halfDaySession": null,
+      "startDate": "2026-09-20",
+      "endDate": "2026-09-21",
+      "totalDays": 2,
+      "reason": "Attending family graduation ceremony",
+      "handoverPerson": "MD RADOUN HOSSAIN",
+      "emergencyContact": "+880 1711-223344",
+      "attachment": null,
+      "status": "APPROVED",
+      "appliedAt": "2026-09-13T07:13:40.724Z",
+      "reviewedBy": "Super Admin",
+      "reviewedAt": "2026-09-13T07:13:40.724Z",
+      "managerRemarks": "Approved. Radioun will cover sales calls."
+    }
+  ]
 }

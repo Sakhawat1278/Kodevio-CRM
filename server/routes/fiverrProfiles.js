@@ -15,24 +15,30 @@ function getDiskProfiles() {
 // GET /api/fiverr-profiles - List all seller profiles
 router.get('/', async (req, res) => {
   try {
-    const diskProfiles = getDiskProfiles();
     if (isPgConnected) {
-      const result = await pool.query('SELECT * FROM fiverr_seller_profiles ORDER BY created_at DESC');
-      if (result.rows.length > 0) {
-        const profiles = result.rows.map((row) => ({
-          id: row.id,
-          name: row.name,
-          username: row.username,
-          level: row.level,
-          badgeClass: row.badge_class,
-          niche: row.niche,
-          avatar: row.avatar_url,
-          profileUrl: row.profile_url,
-          created_at: row.created_at,
-        }));
-        return res.json({ success: true, profiles });
+      try {
+        const result = await pool.query('SELECT * FROM fiverr_seller_profiles ORDER BY created_at DESC');
+        if (result.rows.length > 0) {
+          const profiles = result.rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            username: row.username,
+            level: row.level,
+            badgeClass: row.badge_class,
+            niche: row.niche,
+            avatar: row.avatar_url,
+            profileUrl: row.profile_url,
+            status: row.status || 'ACTIVE',
+            created_at: row.created_at,
+          }));
+          saveFiverrProfilesToDisk(profiles);
+          return res.json({ success: true, profiles });
+        }
+      } catch (pgErr) {
+        console.warn('PG fetch profiles error, falling back to disk:', pgErr.message);
       }
     }
+    const diskProfiles = getDiskProfiles();
     return res.json({ success: true, profiles: diskProfiles });
   } catch (err) {
     console.error('Fetch Fiverr profiles error:', err);
@@ -43,7 +49,7 @@ router.get('/', async (req, res) => {
 // POST /api/fiverr-profiles - Create a new seller profile
 router.post('/', async (req, res) => {
   try {
-    const { name, username, level, badgeClass, niche, avatar, profileUrl } = req.body;
+    const { name, username, level, badgeClass, niche, avatar, profileUrl, status } = req.body;
     if (!name || !username) {
       return res.status(400).json({ error: 'Display Name and Fiverr Username are required' });
     }
@@ -52,7 +58,7 @@ router.post('/', async (req, res) => {
     const finalProfileUrl = profileUrl || `https://www.fiverr.com/${cleanUsername}`;
 
     const created = {
-      id: `fp-${Date.now()}`,
+      id: req.body.id || `fp-${Date.now()}`,
       name: name.trim(),
       username: cleanUsername,
       level: level || 'Level 2 Seller',
@@ -60,6 +66,7 @@ router.post('/', async (req, res) => {
       niche: niche || 'Web & App Development',
       avatar: avatar || null,
       profileUrl: finalProfileUrl,
+      status: status || 'ACTIVE',
       created_at: new Date().toISOString(),
     };
 
@@ -70,12 +77,34 @@ router.post('/', async (req, res) => {
     if (isPgConnected) {
       try {
         const query = `
-          INSERT INTO fiverr_seller_profiles (name, username, level, badge_class, niche, avatar_url, profile_url)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          INSERT INTO fiverr_seller_profiles (id, name, username, level, badge_class, niche, avatar_url, profile_url, status, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            username = EXCLUDED.username,
+            level = EXCLUDED.level,
+            badge_class = EXCLUDED.badge_class,
+            niche = EXCLUDED.niche,
+            avatar_url = EXCLUDED.avatar_url,
+            profile_url = EXCLUDED.profile_url,
+            status = EXCLUDED.status
         `;
-        const values = [name.trim(), cleanUsername, level || 'Level 2 Seller', badgeClass || 'badge-level-2', niche || 'Web & App Development', avatar || '', finalProfileUrl];
+        const values = [
+          created.id,
+          created.name,
+          created.username,
+          created.level,
+          created.badgeClass,
+          created.niche,
+          created.avatar || '',
+          created.profileUrl,
+          created.status,
+          created.created_at,
+        ];
         await pool.query(query, values);
-      } catch (e) {}
+      } catch (e) {
+        console.warn('PG insert fiverr profile error:', e.message);
+      }
     }
 
     return res.json({ success: true, profile: created });
@@ -96,7 +125,9 @@ router.delete('/:id', async (req, res) => {
     if (isPgConnected) {
       try {
         await pool.query('DELETE FROM fiverr_seller_profiles WHERE id = $1', [id]);
-      } catch (e) {}
+      } catch (e) {
+        console.warn('PG delete fiverr profile error:', e.message);
+      }
     }
     return res.json({ success: true, message: 'Profile deleted' });
   } catch (err) {
@@ -133,12 +164,15 @@ router.put('/:id', async (req, res) => {
               badge_class = COALESCE($4, badge_class),
               niche = COALESCE($5, niche),
               avatar_url = COALESCE($6, avatar_url),
-              profile_url = COALESCE($7, profile_url)
-          WHERE id = $8
+              profile_url = COALESCE($7, profile_url),
+              status = COALESCE($8, status)
+          WHERE id = $9
         `;
-        const values = [updated.name, updated.username, updated.level, updated.badgeClass, updated.niche, updated.avatar, updated.profileUrl, id];
+        const values = [updated.name, updated.username, updated.level, updated.badgeClass, updated.niche, updated.avatar, updated.profileUrl, updated.status, id];
         await pool.query(query, values);
-      } catch (e) {}
+      } catch (e) {
+        console.warn('PG update fiverr profile error:', e.message);
+      }
     }
 
     return res.json({ success: true, profile: updated });

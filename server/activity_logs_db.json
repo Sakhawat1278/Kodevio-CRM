@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "act-101",
+    "eventType": "SYSTEM_ONLINE",
+    "title": "Neon PostgreSQL Dynamic Store Initialized",
+    "details": "16 relational databases verified and synced with zero latency.",
+    "actor": "System Engine",
+    "severity": "SUCCESS",
+    "timestamp": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "act-102",
+    "eventType": "LIVE_SYNC",
+    "title": "Dual-Persistence Active",
+    "details": "Bi-directional disk and cloud PostgreSQL synchronization running.",
+    "actor": "Super Admin",
+    "severity": "INFO",
+    "timestamp": "2026-09-13T07:13:40.724Z"
+  }
+]

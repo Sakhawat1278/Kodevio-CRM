@@ -1,12 +1,36 @@
 import express from 'express';
-import { loadActivityLogsFromDisk, saveActivityLogsToDisk, appendActivityLog } from '../db.js';
+import { pool, isPgConnected, loadActivityLogsFromDisk, saveActivityLogsToDisk, appendActivityLog } from '../db.js';
 
 const router = express.Router();
 
+function mapLogRow(r) {
+  return {
+    id: r.id,
+    eventType: r.event_type,
+    title: r.title,
+    details: r.details,
+    actor: r.actor,
+    severity: r.severity,
+    timestamp: r.timestamp
+  };
+}
+
 // GET /api/activity-logs
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const logs = loadActivityLogsFromDisk();
+    if (isPgConnected) {
+      try {
+        const result = await pool.query('SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 200');
+        if (result.rows.length > 0) {
+          const mapped = result.rows.map(mapLogRow);
+          saveActivityLogsToDisk(mapped);
+          return res.json(mapped);
+        }
+      } catch (pgErr) {
+        console.warn('PG fetch activity logs error, falling back to disk:', pgErr.message);
+      }
+    }
+    const logs = loadActivityLogsFromDisk() || [];
     res.json(logs);
   } catch (err) {
     res.status(500).json({ error: 'Failed to load activity logs', details: err.message });
@@ -30,8 +54,15 @@ router.post('/', (req, res) => {
 });
 
 // DELETE /api/activity-logs (Clear Logs)
-router.delete('/', (req, res) => {
+router.delete('/', async (req, res) => {
   try {
+    if (isPgConnected) {
+      try {
+        await pool.query('DELETE FROM activity_logs');
+      } catch (pgErr) {
+        console.warn('PG delete activity logs error:', pgErr.message);
+      }
+    }
     saveActivityLogsToDisk([]);
     res.json({ message: 'Activity logs cleared' });
   } catch (err) {

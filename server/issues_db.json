@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": "iss-101",
+    "projectId": "PRJ-101",
+    "projectTitle": "Enterprise SaaS Analytics Dashboard",
+    "clientName": "Sarah Jenkins",
+    "clientUsername": "sarah_growth",
+    "severity": "MEDIUM",
+    "issueType": "Data Sync",
+    "description": "Real-time SSE heartbeat occasionally disconnects on idle tabs",
+    "status": "IN RESOLUTION",
+    "assignee": "KHALID HASAN",
+    "resolutionNotes": "Heartbeat timer decreased to 15s with auto-reconnect",
+    "reportedAt": "2026-09-13T07:13:40.724Z",
+    "resolvedAt": null
+  },
+  {
+    "id": "iss-102",
+    "projectId": "PRJ-102",
+    "projectTitle": "Mobile Delivery & Driver Dispatch App",
+    "clientName": "Marcus Vance",
+    "clientUsername": "marcus_enterprise",
+    "severity": "HIGH",
+    "issueType": "Push Notifications",
+    "description": "APNs certificate needs rotation for production iOS build",
+    "status": "OPEN",
+    "assignee": "SAMIUL HASAN",
+    "resolutionNotes": "",
+    "reportedAt": "2026-09-13T07:13:40.724Z",
+    "resolvedAt": null
+  }
+]

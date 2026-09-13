@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": "fp-1",
+    "name": "Kodevio Studio",
+    "username": "kodeviostudio",
+    "level": "Top Rated Seller",
+    "badgeClass": "badge-top-rated",
+    "niche": "Full-Stack Web & App Development",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+    "profileUrl": "https://www.fiverr.com/kodeviostudio",
+    "status": "ACTIVE",
+    "created_at": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "fp-2",
+    "name": "TechVerse Solutions",
+    "username": "techverse_pro",
+    "level": "Level 2 Seller",
+    "badgeClass": "badge-level-2",
+    "niche": "Custom SaaS & Cloud Architecture",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    "profileUrl": "https://www.fiverr.com/techverse_pro",
+    "status": "ACTIVE",
+    "created_at": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "fp-3",
+    "name": "NextGen AI Labs",
+    "username": "nextgen_ai",
+    "level": "Level 2 Seller",
+    "badgeClass": "badge-level-2",
+    "niche": "AI Agents & Automation",
+    "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+    "profileUrl": "https://www.fiverr.com/nextgen_ai",
+    "status": "ACTIVE",
+    "created_at": "2026-09-13T07:13:40.724Z"
+  }
+]

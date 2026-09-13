@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "id": "pay-101",
+    "month": "August-2026",
+    "staffId": "10017",
+    "staffName": "MD AL SOHAN",
+    "role": "Sales Manager",
+    "department": "SALES",
+    "baseSalary": 2500,
+    "achievedVolume": 2000,
+    "bonusMultiplier": "1.2x",
+    "bonusAmount": 2250,
+    "totalPayout": 4750,
+    "status": "PAID",
+    "paymentDate": "2026-09-01",
+    "transactionRef": "TXN-SAL-9821",
+    "currency": "USD",
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "pay-102",
+    "month": "August-2026",
+    "staffId": "10034",
+    "staffName": "MD AZHAR UDDIN",
+    "role": "Operations Executive",
+    "department": "OPERATIONS",
+    "baseSalary": 2200,
+    "achievedVolume": 1400,
+    "bonusMultiplier": "1.1x",
+    "bonusAmount": 1900,
+    "totalPayout": 4100,
+    "status": "PAID",
+    "paymentDate": "2026-09-01",
+    "transactionRef": "TXN-OPS-4102",
+    "currency": "USD",
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "pay-103",
+    "month": "August-2026",
+    "staffId": "10023",
+    "staffName": "MD RADOUN HOSSAIN",
+    "role": "Sales Executive",
+    "department": "SALES",
+    "baseSalary": 2000,
+    "achievedVolume": 1250,
+    "bonusMultiplier": "1.0x",
+    "bonusAmount": 1800,
+    "totalPayout": 3800,
+    "status": "PROCESSING",
+    "paymentDate": null,
+    "transactionRef": "—",
+    "currency": "USD",
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  }
+]

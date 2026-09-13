@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "id": "meet-101",
+    "clientName": "Sarah Jenkins",
+    "clientUsername": "sarah_growth",
+    "title": "Milestone 2 Review & Neon DB Verification",
+    "date": "2026-09-15",
+    "time": "14:00 UTC",
+    "platform": "Google Meet",
+    "link": "https://meet.google.com/kdv-live-sync",
+    "attendees": [
+      "Sarah Jenkins",
+      "Super Admin",
+      "MD AZHAR UDDIN"
+    ],
+    "status": "SCHEDULED",
+    "agenda": "Architecture review of PostgreSQL live sync engine",
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "meet-102",
+    "clientName": "Marcus Vance",
+    "clientUsername": "marcus_enterprise",
+    "title": "Driver Dispatch App Sprint Demo",
+    "date": "2026-09-16",
+    "time": "16:30 UTC",
+    "platform": "Zoom",
+    "link": "https://zoom.us/j/9823419082",
+    "attendees": [
+      "Marcus Vance",
+      "Super Admin"
+    ],
+    "status": "SCHEDULED",
+    "agenda": "Walkthrough of route optimization and background geolocation",
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  }
+]

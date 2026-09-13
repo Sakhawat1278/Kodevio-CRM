@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "id": "air-101",
+    "ruleName": "Enterprise SaaS & Cloud Systems",
+    "targetProfile": "Kodevio Studio",
+    "keywords": [
+      "saas",
+      "react",
+      "node",
+      "postgresql",
+      "dashboard",
+      "aws"
+    ],
+    "minBudget": 2000,
+    "autoDispatch": true,
+    "priority": "HIGH",
+    "isActive": true,
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "air-102",
+    "ruleName": "Mobile Apps & Flutter Builds",
+    "targetProfile": "TechVerse Solutions",
+    "keywords": [
+      "flutter",
+      "react native",
+      "ios",
+      "android",
+      "mobile app"
+    ],
+    "minBudget": 1500,
+    "autoDispatch": true,
+    "priority": "HIGH",
+    "isActive": true,
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  },
+  {
+    "id": "air-103",
+    "ruleName": "AI Automation & GenAI Agents",
+    "targetProfile": "NextGen AI Labs",
+    "keywords": [
+      "ai agent",
+      "langchain",
+      "llm",
+      "automation",
+      "python"
+    ],
+    "minBudget": 1200,
+    "autoDispatch": true,
+    "priority": "MEDIUM",
+    "isActive": true,
+    "createdAt": "2026-09-13T07:13:40.724Z"
+  }
+]

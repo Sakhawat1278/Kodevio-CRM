@@ -1,5 +1,7 @@
 import express from 'express';
 import {
+  pool,
+  isPgConnected,
   loadBonusSchemesFromDisk,
   saveBonusSchemesToDisk,
   loadUsersFromDisk,
@@ -8,16 +10,67 @@ import {
 
 const router = express.Router();
 
-// Helper to get fresh data
-function getBonusSchemesData() {
+// Helper to get fresh data with live PostgreSQL priority
+async function getBonusSchemesData() {
+  if (isPgConnected) {
+    try {
+      const res = await pool.query("SELECT * FROM bonus_schemes WHERE id = 'current'");
+      if (res.rows.length > 0 && res.rows[0].grades) {
+        return {
+          grades: res.rows[0].grades,
+          employeePayouts: res.rows[0].employee_payouts || {},
+        };
+      }
+    } catch (e) {
+      console.warn('Error reading bonus schemes from PG:', e.message);
+    }
+  }
   return loadBonusSchemesFromDisk() || { grades: [], employeePayouts: {} };
 }
 
+// Helper to dual-persist bonus schemes to both Neon PostgreSQL and disk JSON
+async function saveBonusSchemesDual(data) {
+  saveBonusSchemesToDisk(data);
+  if (isPgConnected) {
+    try {
+      await pool.query(
+        "INSERT INTO bonus_schemes (id, grades, employee_payouts, updated_at) VALUES ('current', $1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET grades = $1, employee_payouts = $2, updated_at = NOW()",
+        [JSON.stringify(data.grades || []), JSON.stringify(data.employeePayouts || {})]
+      );
+    } catch (e) {
+      console.warn('Error saving bonus schemes to PG:', e.message);
+    }
+  }
+}
+
 // GET /api/bonus-schemes - Get full schemes data (grades, levels, and live employee payouts)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const data = getBonusSchemesData();
-    const allUsers = loadUsersFromDisk() || [];
+    const data = await getBonusSchemesData();
+    let allUsers = [];
+
+    if (isPgConnected) {
+      try {
+        const uRes = await pool.query("SELECT * FROM users ORDER BY created_at ASC");
+        if (uRes.rows.length > 0) {
+          allUsers = uRes.rows.map(r => ({
+            id: r.id,
+            user_code: r.user_code,
+            name: r.full_name,
+            full_name: r.full_name,
+            email: r.email,
+            role: r.role,
+            department: r.department,
+            designation: r.designation,
+            monthlySalary: r.base_salary || '25,000 USD'
+          }));
+        }
+      } catch (e) {}
+    }
+
+    if (allUsers.length === 0) {
+      allUsers = loadUsersFromDisk() || [];
+    }
     
     // Ensure grades are always sorted by minSalary ascending
     data.grades.sort((a, b) => (a.minSalary || 0) - (b.minSalary || 0));
@@ -91,14 +144,14 @@ router.get('/', (req, res) => {
 });
 
 // POST /api/bonus-schemes/grades - Create a new Grade based on salary ranges
-router.post('/grades', (req, res) => {
+router.post('/grades', async (req, res) => {
   try {
     const { department, gradeName, minSalary, maxSalary, description, minTarget, minBonus, levels } = req.body;
     if (!department || minSalary === undefined || maxSalary === undefined) {
       return res.status(400).json({ error: 'Department, min salary, and max salary are required.' });
     }
 
-    const data = getBonusSchemesData();
+    const data = await getBonusSchemesData();
     const deptGrades = data.grades.filter(g => g.department === department);
     const gradeNumber = deptGrades.length + 1;
 
@@ -132,7 +185,7 @@ router.post('/grades', (req, res) => {
 
     data.grades.push(newGrade);
     data.grades.sort((a, b) => (a.minSalary || 0) - (b.minSalary || 0));
-    saveBonusSchemesToDisk(data);
+    await saveBonusSchemesDual(data);
 
     return res.status(201).json({ success: true, grade: newGrade });
   } catch (error) {
@@ -142,10 +195,10 @@ router.post('/grades', (req, res) => {
 });
 
 // PUT /api/bonus-schemes/grades/:id - Update Grade or Levels Configuration
-router.put('/grades/:id', (req, res) => {
+router.put('/grades/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const data = getBonusSchemesData();
+    const data = await getBonusSchemesData();
     const gradeIdx = data.grades.findIndex(g => g.id === id);
 
     if (gradeIdx === -1) {
@@ -163,7 +216,7 @@ router.put('/grades/:id', (req, res) => {
     };
 
     data.grades.sort((a, b) => (a.minSalary || 0) - (b.minSalary || 0));
-    saveBonusSchemesToDisk(data);
+    await saveBonusSchemesDual(data);
     return res.json({ success: true, grade: data.grades[gradeIdx] });
   } catch (error) {
     console.error('Update grade error:', error);
@@ -172,12 +225,12 @@ router.put('/grades/:id', (req, res) => {
 });
 
 // DELETE /api/bonus-schemes/grades/:id - Delete a Grade
-router.delete('/grades/:id', (req, res) => {
+router.delete('/grades/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const data = getBonusSchemesData();
+    const data = await getBonusSchemesData();
     data.grades = data.grades.filter(g => g.id !== id);
-    saveBonusSchemesToDisk(data);
+    await saveBonusSchemesDual(data);
     return res.json({ success: true, id });
   } catch (error) {
     console.error('Delete grade error:', error);
@@ -186,14 +239,14 @@ router.delete('/grades/:id', (req, res) => {
 });
 
 // POST /api/bonus-schemes/payouts/update - Update an employee's achieved target and payout status
-router.post('/payouts/update', (req, res) => {
+router.post('/payouts/update', async (req, res) => {
   try {
     const { employeeId, achievedTarget, status } = req.body;
     if (!employeeId) {
       return res.status(400).json({ error: 'Employee ID is required' });
     }
 
-    const data = getBonusSchemesData();
+    const data = await getBonusSchemesData();
     if (!data.employeePayouts) data.employeePayouts = {};
 
     data.employeePayouts[employeeId] = {
@@ -202,7 +255,7 @@ router.post('/payouts/update', (req, res) => {
       lastUpdated: new Date().toISOString()
     };
 
-    saveBonusSchemesToDisk(data);
+    await saveBonusSchemesDual(data);
     return res.json({
       success: true,
       employeeId,
