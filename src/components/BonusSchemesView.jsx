@@ -221,6 +221,67 @@ export default function BonusSchemesView({ user, onShowToast }) {
     }
   };
 
+  // Load recommended standard 12-tier template for selected department
+  const handleLoadStandardTemplate = async () => {
+    try {
+      const templateGrade = selectedDept === 'SALES' ? {
+        department: 'SALES',
+        gradeName: 'Grade-1',
+        minSalary: 20000,
+        maxSalary: 35000,
+        description: 'Trainee & Junior Sales Executives',
+        minTarget: 1800,
+        minBonus: 2200,
+        levels: [
+          { level: 1, targetAmount: 1800, bonusAmount: 2200 },
+          { level: 2, targetAmount: 2000, bonusAmount: 2500 },
+          { level: 3, targetAmount: 2200, bonusAmount: 2800 },
+          { level: 4, targetAmount: 2400, bonusAmount: 3100 },
+          { level: 5, targetAmount: 2600, bonusAmount: 3400 },
+          { level: 6, targetAmount: 2800, bonusAmount: 3700 },
+          { level: 7, targetAmount: 3000, bonusAmount: 4000 },
+          { level: 8, targetAmount: 3200, bonusAmount: 4300 },
+          { level: 9, targetAmount: 3400, bonusAmount: 4600 },
+          { level: 10, targetAmount: 3600, bonusAmount: 4900 },
+          { level: 11, targetAmount: 3800, bonusAmount: 5200 },
+          { level: 12, targetAmount: 4000, bonusAmount: 5500 }
+        ]
+      } : {
+        department: 'OPERATIONS',
+        gradeName: 'Grade-2',
+        minSalary: 42001,
+        maxSalary: 65000,
+        description: 'Frontend, Backend & Flutter Developers',
+        minTarget: 3200,
+        minBonus: 3500,
+        levels: [
+          { level: 1, targetAmount: 3200, bonusAmount: 3500 },
+          { level: 2, targetAmount: 3800, bonusAmount: 4200 },
+          { level: 3, targetAmount: 4400, bonusAmount: 4900 },
+          { level: 4, targetAmount: 5000, bonusAmount: 5700 },
+          { level: 5, targetAmount: 5600, bonusAmount: 6500 },
+          { level: 6, targetAmount: 6200, bonusAmount: 7300 },
+          { level: 7, targetAmount: 6800, bonusAmount: 8200 },
+          { level: 8, targetAmount: 7400, bonusAmount: 9100 },
+          { level: 9, targetAmount: 8000, bonusAmount: 10000 },
+          { level: 10, targetAmount: 8600, bonusAmount: 11000 },
+          { level: 11, targetAmount: 9200, bonusAmount: 12000 },
+          { level: 12, targetAmount: 9800, bonusAmount: 13100 }
+        ]
+      };
+
+      const res = await bonusSchemesApi.createGrade(templateGrade);
+      if (res?.success && res.grade) {
+        setGrades(prev => [...prev, res.grade]);
+        if (onShowToast) onShowToast();
+        LiveSyncEngine.broadcast('bonus_schemes', templateGrade);
+        loadData();
+      }
+    } catch (err) {
+      console.error('Failed to load standard template:', err);
+    }
+  };
+
   // Modal Level Handlers
   const handleModalAddLevel = () => {
     const existing = editSchemeForm.levels || [];
@@ -376,32 +437,98 @@ export default function BonusSchemesView({ user, onShowToast }) {
       {/* ── CARDS GRID (Modern Polished Layout) ── */}
       <div className="bs-cards-grid">
         {currentDeptGrades.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl border-2 border-dashed border-slate-200 bg-white shadow-sm my-2">
-            <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3 shadow-inner">
-              <Award size={26} />
+          <div className="bs-empty-state-wrap">
+            {/* Dynamic Department Icon Badge */}
+            <div className={`bs-empty-icon-badge ${selectedDept.toLowerCase()}`}>
+              {selectedDept === 'SALES' ? (
+                <TrendingUp size={30} />
+              ) : (
+                <Settings2 size={30} />
+              )}
             </div>
-            <h4 className="text-base font-bold text-slate-800 mb-1">
-              No Bonus Schemes Configured
-            </h4>
-            <p className="text-xs text-slate-500 max-w-md mb-5 leading-relaxed">
-              There are currently no active bonus grades or incentive tiers for the {selectedDept === 'OPERATIONS' ? 'Operations' : 'Sales'} department. Click below to add a new custom grade scheme.
+
+            {/* Department Pill */}
+            <div className={`bs-empty-dept-pill ${selectedDept.toLowerCase()}`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+              <span>{selectedDept} Compensation Engine</span>
+            </div>
+
+            {/* Title & Subtitle */}
+            <h3 className="bs-empty-title">
+              No Bonus Schemes Configured for {selectedDept === 'OPERATIONS' ? 'Operations' : 'Sales'}
+            </h3>
+            <p className="bs-empty-desc">
+              Define structured salary brackets, minimum performance targets, and 12-tier progressive incentive scales to automatically compute and disburse compensation.
             </p>
-            <button
-              type="button"
-              onClick={() => {
-                setNewGradeForm({
-                  gradeName: `Grade-1`,
-                  minSalary: selectedDept === 'SALES' ? 20000 : 35000,
-                  maxSalary: selectedDept === 'SALES' ? 35000 : 50000,
-                  description: '',
-                });
-                setIsAddGradeModalOpen(true);
-              }}
-              className="bs-btn-primary"
-            >
-              <Plus size={14} />
-              <span>Add First Grade</span>
-            </button>
+
+            {/* Actions */}
+            <div className="bs-empty-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  setNewGradeForm({
+                    gradeName: `Grade-1`,
+                    minSalary: selectedDept === 'SALES' ? 20000 : 35000,
+                    maxSalary: selectedDept === 'SALES' ? 35000 : 50000,
+                    description: '',
+                  });
+                  setIsAddGradeModalOpen(true);
+                }}
+                className="bs-empty-btn-primary"
+              >
+                <Plus size={15} />
+                <span>Add First Grade</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLoadStandardTemplate}
+                className="bs-empty-btn-secondary"
+                title="Populate recommended standard 12-tier template"
+              >
+                <Sparkles size={14} className="text-amber-500" />
+                <span>Load Standard Template</span>
+              </button>
+            </div>
+
+            {/* 3 Information Cards / Feature Guide */}
+            <div className="bs-empty-features-grid">
+              <div className="bs-empty-feature-card">
+                <div className="bs-empty-feature-icon">
+                  <DollarSign size={16} />
+                </div>
+                <div>
+                  <h5 className="bs-empty-feature-title">Salary Brackets</h5>
+                  <p className="bs-empty-feature-text">
+                    Staff automatically matched to grades based on monthly base salary.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bs-empty-feature-card">
+                <div className="bs-empty-feature-icon">
+                  <Layers size={16} />
+                </div>
+                <div>
+                  <h5 className="bs-empty-feature-title">12 Tier Milestones</h5>
+                  <p className="bs-empty-feature-text">
+                    Progressive targets from Level 1 to Level 12 with custom bonus amounts.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bs-empty-feature-card">
+                <div className="bs-empty-feature-icon">
+                  <Award size={16} />
+                </div>
+                <div>
+                  <h5 className="bs-empty-feature-title">Live Compensation</h5>
+                  <p className="bs-empty-feature-text">
+                    Syncs in real time with monthly sales &amp; operations dashboards.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           currentDeptGrades.map((grade) => {
