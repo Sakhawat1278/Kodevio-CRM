@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logoImg from '../assets/logo';
 
 export default function Preloader({ onComplete }) {
   const [textIndex, setTextIndex] = useState(0);
@@ -35,7 +36,7 @@ export default function Preloader({ onComplete }) {
     >
       {/* Top Left Kodevio Brand Logo */}
       <div className="preloader-brand">
-        <img src="/icon.webp" alt="Kodevio Logo" className="brand-logo-img" />
+        <img src={logoImg} alt="Kodevio Logo" className="brand-logo-img" />
         <span className="brand-name-text">Kodevio</span>
       </div>
 

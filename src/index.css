@@ -189,11 +189,13 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* Account for fixed 36px desktop titlebar */
+  padding-top: 36px;
 }
 
 .folk-brand-logo {
   position: absolute;
-  top: 2.5rem;
+  top: calc(2.5rem + 36px);
   left: 3.5rem;
   display: flex;
   align-items: center;
@@ -1038,29 +1040,57 @@ button.legal-footer-link:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  padding: 0.58rem 0.75rem;
+  border-radius: 9px;
   border: none;
-  background: none;
+  background: transparent;
   font-size: 0.81rem;
   font-weight: 600;
   color: #64748B;
   cursor: pointer;
   position: relative;
   width: 100%;
-  transition: all 0.15s ease;
+  transition: color 0.18s ease;
   white-space: nowrap !important;
+  user-select: none;
 }
 
 .sidebar-v2-item:hover {
-  background: #F8FAFC;
   color: #0F172A;
 }
 
 .sidebar-v2-item.active {
-  background: #FFF7ED;
   color: #EA580C;
   font-weight: 700;
+}
+
+.sidebar-active-pill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+  border-radius: 9px;
+  border: 1px solid #FED7AA;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.sidebar-active-pill::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 3.5px;
+  background: #EA580C;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.5);
+}
+
+.sidebar-v2-item .item-left,
+.sidebar-v2-item .item-badge {
+  position: relative;
+  z-index: 1;
 }
 
 .item-left {
@@ -1073,11 +1103,18 @@ button.legal-footer-link:hover {
 
 .item-icon {
   color: #94A3B8;
-  transition: color 0.15s ease;
+  transition: color 0.18s ease, transform 0.18s ease;
+  flex-shrink: 0;
 }
 
-.item-icon.active {
-  color: #0F172A;
+.sidebar-v2-item:hover .item-icon {
+  color: #334155;
+  transform: scale(1.06);
+}
+
+.sidebar-v2-item.active .item-icon {
+  color: #EA580C;
+  transform: scale(1.06);
 }
 
 .item-label {
@@ -22233,4 +22270,143 @@ html, body {
   .preloader-welcome-title {
     font-size: 2.2rem !important;
   }
+}
+
+/* ─── DESKTOP APP LAYOUT — Account for fixed 36px titlebar ─── */
+/*  The titlebar is position:fixed, so all page content needs   */
+/*  padding-top: 36px to avoid being hidden underneath it.      */
+.desktop-app-wrapper {
+  padding-top: 36px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ─── DESKTOP WINDOW TITLEBAR & NATIVE CONTROLS (Windows 11 Fluent) ─── */
+.desktop-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  /* Full transparent white glassmorphism */
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  color: #334155;
+  font-size: 0.75rem;
+  user-select: none;
+  /* Fixed sticky at top — inner content scrolls beneath */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 999999;
+  -webkit-app-region: drag;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.desktop-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-left: 0.85rem;
+  -webkit-app-region: drag;
+}
+
+.desktop-titlebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 800;
+  color: #0F172A;
+  font-size: 0.8rem;
+  letter-spacing: -0.01em;
+}
+
+.desktop-logo-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.desktop-logo-text {
+  color: #0F172A;
+  font-weight: 800;
+}
+
+.desktop-logo-badge {
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: #EFF6FF;
+  color: #2563EB;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #BFDBFE;
+}
+
+.desktop-titlebar-center {
+  flex: 1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 1rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #64748B;
+  -webkit-app-region: drag;
+}
+
+.desktop-titlebar-controls {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.desktop-control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  outline: none;
+}
+
+.desktop-control-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #0F172A;
+}
+
+.desktop-control-btn.close:hover {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+
+/* Custom Windows Native Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }

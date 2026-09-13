@@ -2,7 +2,10 @@
   "name": "fiverr-agency-automation",
   "private": true,
   "version": "1.0.0",
+  "description": "Standalone Windows Desktop Application for Kodevio Agency OS",
+  "author": "Kodevio",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "server": "node server/index.js",
@@ -10,7 +13,11 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "lint": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"cross-env PORT=3000 vite\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:start": "electron .",
+    "electron:build": "npm run build && electron-builder --win",
+    "electron:build:portable": "npm run build && electron-builder --win portable"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -32,6 +39,63 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.3.1"
+    "cross-env": "^10.1.0",
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3",
+    "vite": "^5.3.1",
+    "wait-on": "^9.1.0"
+  },
+  "build": {
+    "appId": "com.kodevio.agencyos",
+    "productName": "Kodevio Agency OS",
+    "copyright": "Copyright © 2026 Kodevio",
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "node_modules/**/*",
+      "public/**/*",
+      ".env",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "server/**/*",
+      "dist/**/*",
+      "node_modules/**/*",
+      ".env"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Kodevio Agency OS",
+      "artifactName": "Kodevio-CRM-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Kodevio-CRM-${version}-Portable.${ext}"
+    }
   }
 }

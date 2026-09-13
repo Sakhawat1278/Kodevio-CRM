@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api');
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Generic API Helper
 async function apiFetch(endpoint, options = {}) {
@@ -26,7 +26,20 @@ async function apiFetch(endpoint, options = {}) {
     },
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  } catch (netErr) {
+    // If backend is warming up, retry once after a short delay
+    await new Promise((r) => setTimeout(r, 600));
+    try {
+      response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    } catch (retryErr) {
+      throw new Error(retryErr.message === 'Failed to fetch' 
+        ? 'Connecting to database engine... Please retry in a moment.' 
+        : retryErr.message);
+    }
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

@@ -6,6 +6,8 @@ import Dashboard from './components/Dashboard';
 import ForgotPasswordModal from './components/ForgotPasswordModal';
 import LegalModal from './components/LegalModal';
 import SiriCircleToast from './components/SiriCircleToast';
+import DesktopTitleBar from './components/common/DesktopTitleBar';
+import logoImg from './assets/logo';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -84,6 +86,7 @@ export default function App() {
 
   return (
     <>
+      <DesktopTitleBar />
       <AnimatePresence mode="wait">
         {isLoading ? (
           <Preloader key="preloader" onComplete={() => setIsLoading(false)} />
@@ -115,7 +118,7 @@ export default function App() {
           >
             {/* Top Left Kodevio Brand Logo */}
             <a href="#" className="folk-brand-logo">
-              <img src="/icon.webp" alt="Kodevio Logo" className="brand-logo-img" />
+              <img src={logoImg} alt="Kodevio Logo" className="brand-logo-img" />
               <span className="brand-name-text">Kodevio</span>
             </a>
 

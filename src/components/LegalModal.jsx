@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, FileText } from 'lucide-react';
+import logoImg from '../assets/logo';
 
 export default function LegalModal({ isOpen, initialTab = 'terms', onClose }) {
   const [activeTab, setActiveTab] = useState(initialTab); // 'terms' | 'privacy'
@@ -31,7 +32,7 @@ export default function LegalModal({ isOpen, initialTab = 'terms', onClose }) {
           {/* Top Brand & Title */}
           <div className="legal-modal-header">
             <div className="flex items-center gap-2 mb-2">
-              <img src="/icon.webp" alt="Kodevio Logo" className="w-6 h-6 object-contain" />
+              <img src={logoImg} alt="Kodevio Logo" className="w-6 h-6 object-contain" />
               <span className="font-extrabold text-slate-900 text-lg">Kodevio Limited</span>
             </div>
 

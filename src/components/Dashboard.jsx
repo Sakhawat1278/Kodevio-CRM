@@ -60,6 +60,7 @@ import OperationsMonthlyDashboardView from './OperationsMonthlyDashboardView';
 import LeavesView from './LeavesView';
 import CustomSelect from './common/CustomSelect';
 import SystemHealthInspectorModal from './SystemHealthInspectorModal';
+import logoImg from '../assets/logo';
 import { LiveSyncEngine } from '../services/liveSyncEngine';
 import { syncApi, fiverrProfilesApi, clientsApi, projectsApi, usersApi, performanceApi, systemHealthApi, leavesApi } from '../api/client';
 
@@ -1530,6 +1531,18 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
     }
   };
 
+  // Hook Electron System Tray "Refresh Database Sync"
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.electronAPI?.onTriggerSync) {
+      const unsub = window.electronAPI.onTriggerSync(() => {
+        handleSyncDatabase();
+      });
+      return () => {
+        if (typeof unsub === 'function') unsub();
+      };
+    }
+  }, []);
+
   const getFormattedRole = (role) => {
     if (!role) return 'Super Admin';
     if (role === 'super_admin') return 'Super Admin';
@@ -1695,10 +1708,19 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
       .filter((group) => group.items.length > 0);
   }, [sellerProfiles.length, clientsCount, projectsCount, usersCount, userPermissions]);
 
+  // Standardized Fluid Motion Physics Engine for All 15 Modules
+  const viewMotionProps = {
+    initial: { opacity: 0, y: 14, scale: 0.995 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: -8, scale: 0.995 },
+    transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] },
+  };
+
   return (
-    <div className="dash-sidebar-layout">
-      {/* Mobile Overlay Drawer Backdrop */}
-      {isMobileMenuOpen && (
+    <div className="desktop-app-wrapper flex flex-col w-full min-h-screen">
+      <div className="dash-sidebar-layout flex-1">
+        {/* Mobile Overlay Drawer Backdrop */}
+        {isMobileMenuOpen && (
         <div
           className="sidebar-mobile-backdrop"
           onClick={() => setIsMobileMenuOpen(false)}
@@ -1711,7 +1733,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
         <div className="sidebar-v2-header">
           <div className="flex items-center justify-between w-full">
             <a href="#" className="sidebar-brand-box-v2">
-              <img src="/icon.webp" alt="Kodevio Logo" className="brand-logo-img" />
+              <img src={logoImg} alt="Kodevio Logo" className="brand-logo-img" />
               <div className="brand-titles">
                 <span className="brand-name-text">Kodevio</span>
                 <span className="brand-sub-tag">Agency OS v2.4</span>
@@ -1852,13 +1874,14 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
                     >
                       {isActive && (
                         <motion.div
-                          layoutId="v2ActiveBar"
-                          className="v2-active-accent-bar"
-                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                          layoutId="sidebarActivePill"
+                          className="sidebar-active-pill"
+                          transition={{ type: 'spring', stiffness: 450, damping: 32 }}
                         />
                       )}
 
                       <div className="item-left">
+                        {Icon && <Icon size={16} className={`item-icon ${isActive ? 'active' : ''}`} />}
                         <span className="item-label">{item.label}</span>
                       </div>
 
@@ -1947,10 +1970,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab === 'overview' && (
               <motion.div
                 key="tab-overview"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
+                {...viewMotionProps}
                 className="ovw-root"
               >
                 {/* Top 4 Clean KPI Metric Cards */}
@@ -2518,10 +2538,8 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab === 'fiverr_profiles' && (
               <motion.div
                 key="tab-fiverr-profiles"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
+                className="w-full flex-1 flex flex-col min-h-full"
               >
                 <FiverrProfilesView
                   onShowToast={onShowToast}
@@ -2537,10 +2555,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab === 'clients' && (
               <motion.div
                 key="tab-clients"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
                 className="w-full flex-1 flex flex-col min-h-full"
               >
                 <ClientsView
@@ -2558,10 +2573,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab === 'projects' && (
               <motion.div
                 key="tab-projects"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
                 className="w-full flex-1 flex flex-col min-h-full"
               >
                 <ProjectsView
@@ -2580,37 +2592,46 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
 
             {/* Profile Settings Full View */}
             {activeTab === 'profile' && (
-              <div key="tab-profile" className="w-full">
+              <motion.div
+                key="tab-profile"
+                {...viewMotionProps}
+                className="w-full flex-1 flex flex-col min-h-full"
+              >
                 <ProfileSettingsView
                   user={user}
                   onSave={onUpdateUser}
                   onShowToast={onShowToast}
                 />
-              </div>
+              </motion.div>
             )}
 
             {/* Users / Team Panel */}
             {activeTab === 'team' && (
-              <div key="tab-team" className="w-full">
+              <motion.div
+                key="tab-team"
+                {...viewMotionProps}
+                className="w-full flex-1 flex flex-col min-h-full"
+              >
                 <UsersView user={user} onShowToast={onShowToast} />
-              </div>
+              </motion.div>
             )}
 
             {/* Bonus Schemes Panel (Operations & Sales Only) */}
             {activeTab === 'bonus_schemes' && (
-              <div key="tab-bonus-schemes" className="w-full">
+              <motion.div
+                key="tab-bonus-schemes"
+                {...viewMotionProps}
+                className="w-full flex-1 flex flex-col min-h-full"
+              >
                 <BonusSchemesView user={user} onShowToast={onShowToast} />
-              </div>
+              </motion.div>
             )}
 
             {/* Sales Monthly Dashboard Panel */}
             {activeTab === 'sales_dashboard' && (
               <motion.div
                 key="tab-sales-dashboard"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
                 className="w-full flex-1 flex flex-col min-h-full"
               >
                 <SalesMonthlyDashboardView
@@ -2631,10 +2652,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab === 'ops_dashboard' && (
               <motion.div
                 key="tab-ops-dashboard"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
                 className="w-full flex-1 flex flex-col min-h-full"
               >
                 <OperationsMonthlyDashboardView
@@ -2655,10 +2673,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab === 'leaves' && (
               <motion.div
                 key="tab-leaves"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
                 className="w-full flex-1 flex flex-col min-h-full"
               >
                 <LeavesView
@@ -2673,10 +2688,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
             {activeTab !== 'overview' && activeTab !== 'fiverr_profiles' && activeTab !== 'clients' && activeTab !== 'projects' && activeTab !== 'profile' && activeTab !== 'team' && activeTab !== 'bonus_schemes' && activeTab !== 'sales_dashboard' && activeTab !== 'ops_dashboard' && activeTab !== 'leaves' && (
               <motion.div
                 key={`tab-${activeTab}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
+                {...viewMotionProps}
                 className="dash-card-panel text-center py-12"
               >
                 <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 text-slate-700 font-bold">
@@ -2860,6 +2872,7 @@ export default function Dashboard({ user, onSignOut, onShowToast, onUpdateUser }
         onClose={() => setIsInspectorOpen(false)}
         onShowToast={onShowToast}
       />
+      </div>
     </div>
   );
 }

@@ -1,8 +1,21 @@
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from project root or current working directory
+if (process.env.DOTENV_CONFIG_PATH) {
+  dotenv.config({ path: process.env.DOTENV_CONFIG_PATH });
+} else {
+  dotenv.config({ path: path.join(__dirname, '..', '.env') });
+  dotenv.config();
+}
+
 
 const { Pool } = pg;
 
@@ -13,9 +26,6 @@ export const pool = new Pool({
   connectionString,
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
 });
-
-import fs from 'fs';
-import path from 'path';
 
 function readJsonFile(filePath) {
   try {
@@ -32,21 +42,21 @@ function readJsonFile(filePath) {
   return null;
 }
 
-const CLIENTS_FILE_PATH = path.resolve('server/clients_db.json');
-const PROFILES_FILE_PATH = path.resolve('server/profile_db.json');
-const USERS_FILE_PATH = path.resolve('server/users_db.json');
-const BONUS_SCHEMES_FILE_PATH = path.resolve('server/bonus_schemes_db.json');
-const PROJECTS_FILE_PATH = path.resolve('server/projects_db.json');
-const SALES_MONTHLY_FILE_PATH = path.resolve('server/sales_monthly_db.json');
-const OPS_MONTHLY_FILE_PATH = path.resolve('server/operations_monthly_db.json');
-const FIVERR_PROFILES_FILE_PATH = path.resolve('server/fiverr_profiles_db.json');
-const BRIEFS_FILE_PATH = path.resolve('server/briefs_db.json');
-const ISSUES_FILE_PATH = path.resolve('server/issues_db.json');
-const MEETINGS_FILE_PATH = path.resolve('server/meetings_db.json');
-const PAYOUTS_LEDGER_FILE_PATH = path.resolve('server/payouts_ledger_db.json');
-const AI_RULES_FILE_PATH = path.resolve('server/ai_rules_db.json');
-const ACTIVITY_LOGS_FILE_PATH = path.resolve('server/activity_logs_db.json');
-const LEAVES_FILE_PATH = path.resolve('server/leaves_db.json');
+const CLIENTS_FILE_PATH = path.join(__dirname, 'clients_db.json');
+const PROFILES_FILE_PATH = path.join(__dirname, 'profile_db.json');
+const USERS_FILE_PATH = path.join(__dirname, 'users_db.json');
+const BONUS_SCHEMES_FILE_PATH = path.join(__dirname, 'bonus_schemes_db.json');
+const PROJECTS_FILE_PATH = path.join(__dirname, 'projects_db.json');
+const SALES_MONTHLY_FILE_PATH = path.join(__dirname, 'sales_monthly_db.json');
+const OPS_MONTHLY_FILE_PATH = path.join(__dirname, 'operations_monthly_db.json');
+const FIVERR_PROFILES_FILE_PATH = path.join(__dirname, 'fiverr_profiles_db.json');
+const BRIEFS_FILE_PATH = path.join(__dirname, 'briefs_db.json');
+const ISSUES_FILE_PATH = path.join(__dirname, 'issues_db.json');
+const MEETINGS_FILE_PATH = path.join(__dirname, 'meetings_db.json');
+const PAYOUTS_LEDGER_FILE_PATH = path.join(__dirname, 'payouts_ledger_db.json');
+const AI_RULES_FILE_PATH = path.join(__dirname, 'ai_rules_db.json');
+const ACTIVITY_LOGS_FILE_PATH = path.join(__dirname, 'activity_logs_db.json');
+const LEAVES_FILE_PATH = path.join(__dirname, 'leaves_db.json');
 
 export function loadClientsFromDisk() {
   const parsed = readJsonFile(CLIENTS_FILE_PATH);

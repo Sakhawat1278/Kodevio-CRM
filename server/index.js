@@ -1,7 +1,22 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from project root or current working directory
+if (process.env.DOTENV_CONFIG_PATH) {
+  dotenv.config({ path: process.env.DOTENV_CONFIG_PATH });
+} else {
+  dotenv.config({ path: path.join(__dirname, '..', '.env') });
+  dotenv.config();
+}
+
 import profileRoutes from './routes/profile.js';
 import syncRoutes from './routes/sync.js';
 import fiverrProfilesRoutes from './routes/fiverrProfiles.js';
@@ -18,8 +33,6 @@ import aiRulesRoutes from './routes/aiRules.js';
 import activityLogsRoutes from './routes/activityLogs.js';
 import leavesRoutes from './routes/leaves.js';
 import { initDb, isPgConnected, pool, fallbackStore, loadUsersFromDisk, loadProfilesFromDisk, loadClientsFromDisk, loadBonusSchemesFromDisk, loadProjectsFromDisk, loadSalesMonthlyFromDisk, loadOpsMonthlyFromDisk, loadBriefsFromDisk, loadIssuesFromDisk, loadMeetingsFromDisk, loadPayoutsLedgerFromDisk, loadAiRulesFromDisk, loadActivityLogsFromDisk, loadLeavesFromDisk } from './db.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -676,12 +689,57 @@ app.get('/api/db/inspect', async (req, res) => {
   }
 });
 
+// Serve built React Vite frontend in production / desktop mode
+const candidates = [
+  path.join(__dirname, '..', 'dist'),
+  path.join(__dirname, 'dist'),
+  path.join(process.resourcesPath || '', 'app.asar.unpacked', 'dist'),
+  path.join(process.resourcesPath || '', 'app.asar', 'dist'),
+  path.resolve('dist'),
+  path.join(process.cwd(), 'dist'),
+];
+const distPath = candidates.find((p) => p && fs.existsSync(p));
+
+if (distPath && fs.existsSync(distPath)) {
+  console.log(`📦 Serving production frontend from: ${distPath}`);
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/db-inspector')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  console.warn('⚠️ Static frontend dist path not found; candidates checked:', candidates.filter(Boolean));
+}
+
+// Graceful pool shutdown on exit signals
+async function shutdownGracefully(signal) {
+  console.log(`\n🛑 Received ${signal}, closing database connections...`);
+  try {
+    if (pool && typeof pool.end === 'function') {
+      await pool.end();
+      console.log('✅ PostgreSQL connection pool drained.');
+    }
+  } catch (err) {
+    console.warn('⚠️ Error during pool shutdown:', err.message);
+  }
+  process.exit(0);
+}
+
+process.on('SIGINT', () => shutdownGracefully('SIGINT'));
+process.on('SIGTERM', () => shutdownGracefully('SIGTERM'));
+
 // Start Express Server
 async function startServer() {
-  await initDb();
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`🚀 Kodevio Agency OS Backend active at http://localhost:${PORT}`);
   });
+
+  // Initialize DB in background without blocking server socket
+  initDb().catch((err) => {
+    console.error('⚠️ Database initialization error:', err.message);
+  });
+
+  return server;
 }
 
 startServer();
