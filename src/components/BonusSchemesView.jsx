@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  FolderKanban,
   Award,
   TrendingUp,
   Settings2,
@@ -437,97 +438,13 @@ export default function BonusSchemesView({ user, onShowToast }) {
       {/* ── CARDS GRID (Modern Polished Layout) ── */}
       <div className="bs-cards-grid">
         {currentDeptGrades.length === 0 ? (
-          <div className="bs-empty-state-wrap">
-            {/* Dynamic Department Icon Badge */}
-            <div className={`bs-empty-icon-badge ${selectedDept.toLowerCase()}`}>
-              {selectedDept === 'SALES' ? (
-                <TrendingUp size={30} />
-              ) : (
-                <Settings2 size={30} />
-              )}
-            </div>
-
-            {/* Department Pill */}
-            <div className={`bs-empty-dept-pill ${selectedDept.toLowerCase()}`}>
-              <span className="w-1.5 h-1.5 rounded-full bg-current" />
-              <span>{selectedDept} Compensation Engine</span>
-            </div>
-
-            {/* Title & Subtitle */}
-            <h3 className="bs-empty-title">
-              No Bonus Schemes Configured for {selectedDept === 'OPERATIONS' ? 'Operations' : 'Sales'}
-            </h3>
-            <p className="bs-empty-desc">
-              Define structured salary brackets, minimum performance targets, and 12-tier progressive incentive scales to automatically compute and disburse compensation.
-            </p>
-
-            {/* Actions */}
-            <div className="bs-empty-actions">
-              <button
-                type="button"
-                onClick={() => {
-                  setNewGradeForm({
-                    gradeName: `Grade-1`,
-                    minSalary: selectedDept === 'SALES' ? 20000 : 35000,
-                    maxSalary: selectedDept === 'SALES' ? 35000 : 50000,
-                    description: '',
-                  });
-                  setIsAddGradeModalOpen(true);
-                }}
-                className="bs-empty-btn-primary"
-              >
-                <Plus size={15} />
-                <span>Add First Grade</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleLoadStandardTemplate}
-                className="bs-empty-btn-secondary"
-                title="Populate recommended standard 12-tier template"
-              >
-                <Sparkles size={14} className="text-amber-500" />
-                <span>Load Standard Template</span>
-              </button>
-            </div>
-
-            {/* 3 Information Cards / Feature Guide */}
-            <div className="bs-empty-features-grid">
-              <div className="bs-empty-feature-card">
-                <div className="bs-empty-feature-icon">
-                  <DollarSign size={16} />
-                </div>
-                <div>
-                  <h5 className="bs-empty-feature-title">Salary Brackets</h5>
-                  <p className="bs-empty-feature-text">
-                    Staff automatically matched to grades based on monthly base salary.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bs-empty-feature-card">
-                <div className="bs-empty-feature-icon">
-                  <Layers size={16} />
-                </div>
-                <div>
-                  <h5 className="bs-empty-feature-title">12 Tier Milestones</h5>
-                  <p className="bs-empty-feature-text">
-                    Progressive targets from Level 1 to Level 12 with custom bonus amounts.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bs-empty-feature-card">
-                <div className="bs-empty-feature-icon">
-                  <Award size={16} />
-                </div>
-                <div>
-                  <h5 className="bs-empty-feature-title">Live Compensation</h5>
-                  <p className="bs-empty-feature-text">
-                    Syncs in real time with monthly sales &amp; operations dashboards.
-                  </p>
-                </div>
-              </div>
+          <div className="prj-empty-table-cell" style={{ gridColumn: '1 / -1', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '3.75rem 1.5rem', width: '100%' }}>
+            <div className="prj-empty-inner">
+              <FolderKanban size={34} className="prj-empty-icon" />
+              <h3 className="prj-empty-title">No bonus schemes found</h3>
+              <p className="prj-empty-desc">
+                There are no bonus scheme grades in your workspace. Click "+ Add Grade" to create a new scheme.
+              </p>
             </div>
           </div>
         ) : (
