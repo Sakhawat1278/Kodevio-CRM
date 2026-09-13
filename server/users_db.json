@@ -1,0 +1,35 @@
+[
+  {
+    "id": "usr-001",
+    "name": "Super Admin",
+    "userCode": "K001",
+    "email": "admin@kodevio.com",
+    "phone": "+880 1711-000001",
+    "password": "••••••••",
+    "role": "administrator",
+    "department": "MANAGEMENT",
+    "designation": "Managing Director",
+    "category": null,
+    "status": "ACTIVE",
+    "allowLogin": true,
+    "joinDate": "2022-01-15",
+    "confirmationDate": "2022-04-15",
+    "monthlySalary": "9,500.00",
+    "reportsTo": null,
+    "weekendDays": [
+      "Friday",
+      "Saturday"
+    ],
+    "shiftStartTime": "09:00 AM",
+    "shiftEndTime": "06:00 PM",
+    "casualLeave": 10,
+    "sickLeave": 14,
+    "earnedLeave": 17,
+    "lwop": 365,
+    "linkedinUrl": "",
+    "githubUrl": "",
+    "portfolioUrl": "",
+    "bio": "Founding administrator.",
+    "avatar": null
+  }
+]

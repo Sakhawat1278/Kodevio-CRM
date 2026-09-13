@@ -1,0 +1,23 @@
+{
+  "K001": {
+    "user_id": "K001",
+    "user_code": "K001",
+    "first_name": "Super",
+    "last_name": "Admin",
+    "phone": "+880 1711-000001",
+    "language": "English",
+    "direction": "System Default",
+    "facebook": "",
+    "linkedin": "",
+    "github": "",
+    "email_signature": "Best Regards,\nSuper Admin",
+    "two_factor_method": "disabled",
+    "avatar_url": "",
+    "department": "MANAGEMENT",
+    "designation": "Managing Director",
+    "joined_date": "April 1, 2026",
+    "base_salary": "22,000 USD",
+    "bonus_balance": " USD",
+    "employment_status": "ACTIVE"
+  }
+}

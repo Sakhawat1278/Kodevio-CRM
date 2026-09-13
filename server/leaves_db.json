@@ -1,0 +1,11 @@
+{
+  "quotas": {
+    "casual": 14,
+    "sick": 10,
+    "annual": 15,
+    "emergency": 5,
+    "maternity": 90,
+    "paternity": 10
+  },
+  "leaves": []
+}
