@@ -35,6 +35,8 @@ export default function BonusSchemesView({ user, onShowToast }) {
   // Modals & form state
   const [isAddGradeModalOpen, setIsAddGradeModalOpen] = useState(false);
   const [isEditSchemeModalOpen, setIsEditSchemeModalOpen] = useState(false);
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [gradeToDelete, setGradeToDelete] = useState(null);
   const [editingGrade, setEditingGrade] = useState(null);
 
@@ -201,6 +203,24 @@ export default function BonusSchemesView({ user, onShowToast }) {
     }
   };
 
+  // Clear all bonus schemes data
+  const handleClearAllSchemes = async () => {
+    try {
+      setIsClearing(true);
+      await bonusSchemesApi.clearBonusSchemes();
+      setGrades([]);
+      setEligibleEmployees([]);
+      setIsClearAllModalOpen(false);
+      if (onShowToast) onShowToast();
+      LiveSyncEngine.broadcast('bonus_schemes', { cleared: true });
+      loadData();
+    } catch (err) {
+      console.error('Failed to clear bonus schemes:', err);
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   // Modal Level Handlers
   const handleModalAddLevel = () => {
     const existing = editSchemeForm.levels || [];
@@ -272,14 +292,38 @@ export default function BonusSchemesView({ user, onShowToast }) {
           </div>
         </div>
 
-        <div className="bs-header-right">
+        <div className="bs-header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          {grades.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setIsClearAllModalOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.55rem 0.9rem',
+                borderRadius: '8px',
+                border: '1px solid #FECACA',
+                background: '#FEF2F2',
+                color: '#DC2626',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="Clear all bonus schemes data"
+            >
+              <Trash2 size={13} />
+              <span>Clear All</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {
               setNewGradeForm({
                 gradeName: `Grade-${currentDeptGrades.length + 1}`,
-                minSalary: 20000,
-                maxSalary: 35000,
+                minSalary: selectedDept === 'SALES' ? 20000 : 35000,
+                maxSalary: selectedDept === 'SALES' ? 35000 : 50000,
                 description: '',
               });
               setIsAddGradeModalOpen(true);
@@ -332,8 +376,32 @@ export default function BonusSchemesView({ user, onShowToast }) {
       {/* ── CARDS GRID (Modern Polished Layout) ── */}
       <div className="bs-cards-grid">
         {currentDeptGrades.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-slate-400">
-            No grades defined for {selectedDept}. Click "Add Grade" above to create one.
+          <div className="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl border-2 border-dashed border-slate-200 bg-white shadow-sm my-2">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3 shadow-inner">
+              <Award size={26} />
+            </div>
+            <h4 className="text-base font-bold text-slate-800 mb-1">
+              No Bonus Schemes Configured
+            </h4>
+            <p className="text-xs text-slate-500 max-w-md mb-5 leading-relaxed">
+              There are currently no active bonus grades or incentive tiers for the {selectedDept === 'OPERATIONS' ? 'Operations' : 'Sales'} department. Click below to add a new custom grade scheme.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setNewGradeForm({
+                  gradeName: `Grade-1`,
+                  minSalary: selectedDept === 'SALES' ? 20000 : 35000,
+                  maxSalary: selectedDept === 'SALES' ? 35000 : 50000,
+                  description: '',
+                });
+                setIsAddGradeModalOpen(true);
+              }}
+              className="bs-btn-primary"
+            >
+              <Plus size={14} />
+              <span>Add First Grade</span>
+            </button>
           </div>
         ) : (
           currentDeptGrades.map((grade) => {
@@ -380,19 +448,17 @@ export default function BonusSchemesView({ user, onShowToast }) {
                       <Edit2 size={14} />
                     </button>
 
-                    {currentDeptGrades.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setGradeToDelete(grade);
-                        }}
-                        className="bs-sc-action-btn delete"
-                        title="Delete Scheme"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setGradeToDelete(grade);
+                      }}
+                      className="bs-sc-action-btn delete"
+                      title="Delete Scheme"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
 
@@ -795,6 +861,92 @@ export default function BonusSchemesView({ user, onShowToast }) {
                 >
                   <Trash2 size={13} />
                   <span>Confirm Delete</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── CUSTOM CLEAR ALL SCHEMES CONFIRMATION MODAL ── */}
+      <AnimatePresence>
+        {isClearAllModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="cli-modal-overlay"
+            onClick={(e) => { if (e.target === e.currentTarget && !isClearing) setIsClearAllModalOpen(false); }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="cli-small-modal-card"
+            >
+              <div className="cli-modal-header-redesigned">
+                <div className="cli-modal-header-left">
+                  <div className="cli-modal-icon-badge" style={{ background: 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)', border: '1px solid #FECACA', color: '#DC2626' }}>
+                    <Trash2 size={20} />
+                  </div>
+                  <div className="cli-modal-header-titles">
+                    <h3 className="cli-modal-title-text">Clear All Bonus Schemes?</h3>
+                    <p className="cli-modal-sub-text">
+                      Reset grades and payout configurations to empty
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={isClearing}
+                  onClick={() => setIsClearAllModalOpen(false)}
+                  className="cli-modal-close-btn-redesigned"
+                  title="Close"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '0.85rem 1rem', marginBottom: '1.25rem' }}>
+                <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7F1D1D', margin: 0, lineHeight: 1.6 }}>
+                  Are you sure you want to clear all existing bonus schemes data? This will remove all grades, level tiers, and employee payout adjustments across both Sales and Operations in both Neon PostgreSQL and local database stores.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  disabled={isClearing}
+                  onClick={() => setIsClearAllModalOpen(false)}
+                  className="fp-btn-cancel-compact"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isClearing}
+                  onClick={handleClearAllSchemes}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    padding: '0.5rem 1rem',
+                    background: '#DC2626',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '7px',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    cursor: isClearing ? 'not-allowed' : 'pointer',
+                    opacity: isClearing ? 0.7 : 1,
+                    boxShadow: '0 2px 6px rgba(220,38,38,0.25)',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <Trash2 size={13} />
+                  <span>{isClearing ? 'Clearing...' : 'Yes, Clear Everything'}</span>
                 </button>
               </div>
             </motion.div>

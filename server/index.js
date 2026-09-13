@@ -75,7 +75,7 @@ app.get('/api/db/inspect', async (req, res) => {
     const diskProfiles = loadProfilesFromDisk();
     const diskClients = loadClientsFromDisk();
     const diskProjects = loadProjectsFromDisk();
-    const diskBonusSchemes = loadBonusSchemesFromDisk() || { grades: [], employeePayouts: {} };
+    let bonusSchemes = loadBonusSchemesFromDisk() || { grades: [], employeePayouts: {} };
     const diskSalesMonthly = loadSalesMonthlyFromDisk() || {};
     const diskOpsMonthly = loadOpsMonthlyFromDisk() || {};
 
@@ -109,6 +109,16 @@ app.get('/api/db/inspect', async (req, res) => {
       }
       const bRes = await pool.query('SELECT * FROM fiverr_briefs');
       const oRes = await pool.query('SELECT * FROM orders');
+
+      try {
+        const bsRes = await pool.query("SELECT * FROM bonus_schemes WHERE id = 'current'");
+        if (bsRes.rows.length > 0 && Array.isArray(bsRes.rows[0].grades)) {
+          bonusSchemes = {
+            grades: bsRes.rows[0].grades,
+            employeePayouts: bsRes.rows[0].employee_payouts || {},
+          };
+        }
+      } catch (e) {}
 
       usersList = uRes.rows.length > 0 ? uRes.rows : (diskUsers || []);
       profilesList = pRes.rows;
@@ -280,7 +290,7 @@ app.get('/api/db/inspect', async (req, res) => {
         </div>
 
         <div class="section">
-          <h2>🎯 Bonus Schemes &amp; Levels Configuration (${diskBonusSchemes.grades.length} Grades)</h2>
+          <h2>🎯 Bonus Schemes &amp; Levels Configuration (${bonusSchemes.grades.length} Grades)</h2>
           <table>
             <thead>
               <tr>
@@ -294,9 +304,9 @@ app.get('/api/db/inspect', async (req, res) => {
             </thead>
             <tbody>
               ${
-                diskBonusSchemes.grades.length === 0
+                bonusSchemes.grades.length === 0
                   ? '<tr><td colspan="6">No bonus scheme grades configured.</td></tr>'
-                  : diskBonusSchemes.grades
+                  : bonusSchemes.grades
                       .map(
                         (g) => {
                           const lvls = g.levels || [];

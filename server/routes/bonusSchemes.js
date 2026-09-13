@@ -238,6 +238,18 @@ router.delete('/grades/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/bonus-schemes/clear - Clear all bonus schemes and employee payouts
+router.delete('/clear', async (req, res) => {
+  try {
+    const emptyData = { grades: [], employeePayouts: {} };
+    await saveBonusSchemesDual(emptyData);
+    return res.json({ success: true, message: 'All bonus schemes cleared successfully', data: emptyData });
+  } catch (error) {
+    console.error('Clear bonus schemes error:', error);
+    res.status(500).json({ error: 'Failed to clear bonus schemes' });
+  }
+});
+
 // POST /api/bonus-schemes/payouts/update - Update an employee's achieved target and payout status
 router.post('/payouts/update', async (req, res) => {
   try {

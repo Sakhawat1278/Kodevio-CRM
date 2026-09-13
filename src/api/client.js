@@ -226,6 +226,12 @@ export const bonusSchemesApi = {
     });
   },
 
+  clearBonusSchemes: async () => {
+    return apiFetch('/bonus-schemes/clear', {
+      method: 'DELETE',
+    });
+  },
+
   updateEmployeePayout: async (payload) => {
     return apiFetch('/bonus-schemes/payouts/update', {
       method: 'POST',
